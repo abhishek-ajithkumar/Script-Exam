@@ -42,6 +42,7 @@ define(['N/currentRecord', 'N/email', 'N/record', 'N/https'],
                 let currentRecordObj = scriptContext.currentRecord;
                 let courseField = 'custrecord_jj_language';
                 let courseField2 = 'language';
+                let fee = 0;
 
                 if (scriptContext.fieldId === courseField) {
                     let courseValue = currentRecordObj.getValue({
@@ -52,7 +53,7 @@ define(['N/currentRecord', 'N/email', 'N/record', 'N/https'],
                         id: courseValue,
                         isDynamic: true
                     });
-                    let fee = feeDetails.getValue({
+                    fee = feeDetails.getValue({
                         fieldId: 'custrecord_jj_fee'
                     })
                     currentRecordObj.setValue({
@@ -69,7 +70,7 @@ define(['N/currentRecord', 'N/email', 'N/record', 'N/https'],
                         id: courseValue,
                         isDynamic: true
                     });
-                    let fee = feeDetails.getValue({
+                    fee = feeDetails.getValue({
                         fieldId: 'custrecord_jj_fee'
                     })
                     currentRecordObj.setValue({
@@ -80,36 +81,36 @@ define(['N/currentRecord', 'N/email', 'N/record', 'N/https'],
 
                 let tranCurrency1 = 'custrecord_jj_transaction_currency'
                 let tranCurrency2 = 'transaction_currency'
+
                 if (scriptContext.fieldId === tranCurrency1) {
                     let currencyValue = currentRecordObj.getText({
                         fieldId: tranCurrency1
                     });
-                    console.log(currencyValue)
+                    // console.log(currencyValue)
 
                 }
                 else if (scriptContext.fieldId === tranCurrency2) {
                     let currencyValue = currentRecordObj.getText({
                         fieldId: tranCurrency2
                     });
-                    console.log(currencyValue)
+                    // console.log('currencyValue'+ currencyValue)
 
-                    let exrate = getExchangeRate()
-                    console.log('exrate rate3:' + exrate);
+                    let exrate = getExchangeRate(currencyValue)
+                    console.log('exrate rate:' + exrate);
                     
-                    let fee = feeDetails.getValue({
-                        fieldId: 'custrecord_jj_fee_amount'
-                    })
+                
+                    let fee = currentRecordObj.getValue({
+                        fieldId: 'fee_amount'
+                    });
+                    console.log('fee:' + fee);
 
                     let payable = fee * exrate;
                     currentRecordObj.setValue({
-                        fieldId: 'custrecord_jj_exchange_rate',
+                        fieldId: 'exchange_rate',
                         value: payable
                     });
 
-
                 }
-
-
 
             }
             catch (e) {
@@ -123,14 +124,14 @@ define(['N/currentRecord', 'N/email', 'N/record', 'N/https'],
 
         }
 
-        function getExchangeRate() {
+        function getExchangeRate(currencyValue) {
 
             var headerObj = {
                 'Content-Type': 'application/json' 
             };
 
             var response = https.get({
-                url: 'https://api.freecurrencyapi.com/v1/latest?apikey=fca_live_sl4RQKsW8utsnlmK5V4SWfgMoEcSGF2heNm2Ijnl&currencies=EUR%2CUSD%2CCAD%2CINR%2CSGD&base_currency=INR',
+                url: 'https://api.freecurrencyapi.com/v1/latest?apikey=fca_live_sl4RQKsW8utsnlmK5V4SWfgMoEcSGF2heNm2Ijnl&currencies='+currencyValue+'&base_currency=INR',
                 headers: headerObj
             });
             console.log("response", response)
@@ -138,8 +139,9 @@ define(['N/currentRecord', 'N/email', 'N/record', 'N/https'],
             let data1 = JSON.parse(response.body)
             console.log("data1",data1)
 
-            let exchangeRate = data1.data['USD']
+            let exchangeRate = data1.data[currencyValue]
             console.log("exchangeRate",exchangeRate)
+            return exchangeRate
 
             // const apiUrl = 'https://api.freecurrencyapi.com/v1/latest?apikey=fca_live_sl4RQKsW8utsnlmK5V4SWfgMoEcSGF2heNm2Ijnl&currencies=EUR%2CUSD%2CCAD%2CINR%2CSGD&base_currency=INR';
             // fetch(apiUrl)
