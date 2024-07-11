@@ -92,7 +92,7 @@ define(['N/email', 'N/record', 'N/ui/serverWidget'],
                 scriptContext.response.writePage(form);
 
             }
-            else if (scriptContext.request.method === 'POST') {
+            else {
 
                 let name = scriptContext.request.parameters.name;
                 let country = scriptContext.request.parameters.country;
@@ -155,6 +155,22 @@ define(['N/email', 'N/record', 'N/ui/serverWidget'],
                 
                     recordId = akshayaRecord.save();
 
+                    // email.send({
+                    //     author: -5, 
+                    //     recipients: 'abhishek@gnail.com',
+                    //     subject: 'Tution Fee Query Received for Training',
+                    //     body: 'Dear Admin \n \n A candidate has been succcessfully registered for training \n \n Record Link: \n https://td2920694.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=66&id='+ recordId
+        
+                    // });
+
+                    email.send({
+                        author: -5,
+                        recipients: 'abhishek@gnail.com',
+                        subject: 'Test Sample Email Module',
+                        body: 'email body'
+                    
+                    });
+
                     scriptContext.response.write('Registration was successfully completed. Record ID: ' + recordId);
 
                     
@@ -167,13 +183,7 @@ define(['N/email', 'N/record', 'N/ui/serverWidget'],
                     scriptContext.response.write('An error occurred while creating record: ' + e.message);
                 }
             }
-            email.send({
-                author: -5, 
-                recipients: 'abhishek@gnail.com',
-                subject: 'Tution Fee Query Received for Training',
-                body: 'Dear Admin \n \n A candidate has been succcessfully registered for training \n \n Record Link: \n https://td2920694.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=66&id='+ recordId
-
-            });
+           
 
         }
 

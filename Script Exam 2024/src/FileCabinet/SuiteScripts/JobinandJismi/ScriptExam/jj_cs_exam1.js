@@ -3,13 +3,13 @@
  * @NScriptType ClientScript
  * @NModuleScope SameAccount
  */
-define(['N/currentRecord', 'N/email', 'N/record'],
+define(['N/currentRecord', 'N/email', 'N/record', 'N/https'],
     /**
      * @param{currentRecord} currentRecord
      * @param{email} email
      * @param{record} record
      */
-    function (currentRecord, email, record) {
+    function (currentRecord, email, record, https) {
 
         // /**
         //  * Function to be executed after page is initialized.
@@ -125,24 +125,40 @@ define(['N/currentRecord', 'N/email', 'N/record'],
 
         function getExchangeRate() {
 
-            const apiUrl = 'https://api.freecurrencyapi.com/v1/latest?apikey=fca_live_sl4RQKsW8utsnlmK5V4SWfgMoEcSGF2heNm2Ijnl&currencies=EUR%2CUSD%2CCAD%2CINR%2CSGD&base_currency=INR';
-            fetch(apiUrl)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not good..!!');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    let exchangeRate = parseFloat(data.data.USD);
-                    console.log(`Exchange rate: ${exchangeRate}`);
-                    return exchangeRate;
+            var headerObj = {
+                'Content-Type': 'application/json' 
+            };
 
-                })
+            var response = https.get({
+                url: 'https://api.freecurrencyapi.com/v1/latest?apikey=fca_live_sl4RQKsW8utsnlmK5V4SWfgMoEcSGF2heNm2Ijnl&currencies=EUR%2CUSD%2CCAD%2CINR%2CSGD&base_currency=INR',
+                headers: headerObj
+            });
+            console.log("response", response)
 
-                .catch(error => {
-                    console.error('There was a problem fetching the data:', error);
-                });
+            let data1 = JSON.parse(response.body)
+            console.log("data1",data1)
+
+            let exchangeRate = data1.data['USD']
+            console.log("exchangeRate",exchangeRate)
+
+            // const apiUrl = 'https://api.freecurrencyapi.com/v1/latest?apikey=fca_live_sl4RQKsW8utsnlmK5V4SWfgMoEcSGF2heNm2Ijnl&currencies=EUR%2CUSD%2CCAD%2CINR%2CSGD&base_currency=INR';
+            // fetch(apiUrl)
+            //     .then(response => {
+            //         if (!response.ok) {
+            //             throw new Error('Network response was not good..!!');
+            //         }
+            //         return response.json();
+            //     })
+            //     .then(data => {
+            //         let exchangeRate = parseFloat(data.data.USD);
+            //         console.log(`Exchange rate: ${exchangeRate}`);
+            //         return exchangeRate;
+
+            //     })
+
+            //     .catch(error => {
+            //         console.error('There was a problem fetching the data:', error);
+            //     });
         }
 
         // /**
